@@ -33,37 +33,31 @@
 	<!-- <h1>Earthquakes that have occurred in the past 24 hours</h1> -->
   <!-- code where we create and name the container that holds the map -->
 	<div class="map_title">
-		<h5>Crime Rate in Pierce County</h5>
+		<h5>Crime Map in Pierce County</h5>
 	</div>
 	<div id="map"></div>
 
 
 	<div id="legend">
-		<h3><center>Crime Sport</center></h3>
+		<h3><center>Crime Spot</center></h3>
 		<ul style="list-style-type:none">
 			<li>
-				<svg width="24" height="24">
-					<circle cx="12" cy="20" r="2" stroke="red" stroke-width="3" fill="red" fill-opacity=".4"/>
+				<svg width="4" height="4">
+					<img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png" alt="" height=20px width=20px>
 				</svg>
-				<text>Less than 1</text>
+				<text>Crime Spot</text>
 			</li>
 			<li>
 				<svg width="24" height="24">
-					<circle cx="12" cy="18" r="4" stroke="red" stroke-width="3" fill="red" fill-opacity=".4"/>
+					<circle cx="12" cy="14" r="6" stroke="brown" stroke-width="3" fill="white" fill-opacity=".4"/>
 				</svg>
-				<text>Between 1 and 2.5</text>
+				<text>Cities in Pierce County</text>
 			</li>
 			<li>
 				<svg width="24" height="24">
-					<circle cx="12" cy="14" r="6" stroke="red" stroke-width="3" fill="red" fill-opacity=".4"/>
+					<circle cx="12" cy="12" r="10" stroke="red" stroke-width="3" fill="white" fill-opacity=".4"/>
 				</svg>
-				<text>Between 2.5 and 4.5</text>
-			</li>
-			<li>
-				<svg width="24" height="24">
-					<circle cx="12" cy="12" r="10" stroke="red" stroke-width="3" fill="red" fill-opacity=".4"/>
-				</svg>
-				<text x="0" y="0)">Greater than 4.5</text>
+				<text x="0" y="0)">Piercy County Boundary</text>
 			</li>
 		</ul>
 	</div>
@@ -74,7 +68,7 @@
 			// var basemap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
 			// 	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 			// }).addTo(mymap);
-			var mymap = L.map('map').setView([47.257326616000057, -122.275091041999985], 12);
+			var mymap = L.map('map').setView([47.037320, -122.225131], 10);
 
 	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
@@ -87,40 +81,40 @@
 	}).addTo(mymap);
 
       // //load GeoJSON from an external file and add it to the map
-      // $.getJSON("datas/Crime_Data.geojson",function(data){
-      //     L.geoJson(data).addTo(mymap);
-      // });
+      $.getJSON("datas/Pierce_County_Boundary_Lines.geojson",function(data){
+          L.geoJson(data,{
+						color:'red'
+					}).addTo(mymap);
+      });
+			//load GeoJSON from an external file and add it to the map
+			$.getJSON("datas/Cities_in_Pierce_County.geojson",function(data){
+					L.geoJson(data,{
+						color: '#8B3A3A',
+						fillColor: '#F0FFF0',
+						fillOpacity: 0.5
+					}).addTo(mymap);
+			});
 
-      $.getJSON("datas/Crime_Data.geojson",function(data){
+			//marker types
+			var redIcon = new L.Icon({
+			  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+			  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+			  iconSize: [25, 41],
+			  iconAnchor: [12, 41],
+			  popupAnchor: [1, -34],
+			  shadowSize: [41, 41]
+			});
+
+      $.getJSON("datas/Crimes_Data.geojson",function(data){
             L.geoJson(data, {
                 pointToLayer: function(feature, latlng){
-                    var marker = L.marker(latlng);
-                    // marker.bindPopup("Location: " + feature.properties.place + "<br>Magnitude: " + feature.properties.mag + "<br><a href =" + feature.properties.url +">More info</a>");
+                    var marker = L.marker(latlng,{icon:redIcon});
+                     marker.bindPopup("Case #: " + feature.properties.CaseNo + "<br>LocCode: " + feature.properties.LocCode + "<br>Name of Crime: "+feature.properties.Public_Nam+"<br>Date: "+feature.properties.OccurredOn);
                     //marker.bindPopup("hello!");
                     return marker;
                 }
             }).addTo(mymap);
         });
-
-
-      // $.getJSON("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson",function(data){
-      // 	// add GeoJSON layer to the map once the file is loaded
-      // 		L.geoJson(data, {
-      // 			pointToLayer: function(feature, latlng){
-      //                 		var radiusSize,
-      // 				mag = feature.properties.mag;
-      //                 			if (mag > 4.5) radiusSize = 10;
-      // 					else if ( mag > 2.5) radiusSize = 6;
-      //                 			else if (mag > 1) radiusSize = 4;
-      // 					else radiusSize = 2;
-      //                 		var marker = L.circleMarker(latlng, {radius: radiusSize, color: 'red'});
-      // 				marker.bindPopup("Location: " + feature.properties.place + "<br>Magnitude: " + feature.properties.mag + "<br><a href =" + feature.properties.url +">More info</a>");
-      // 				return marker;
-      // 			}
-      // 		}).addTo(mymap);
-      // });
-
-
 
 			// load GeoJSON from an external file and add it to the map
 			// $.getJSON("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson",function(data){
